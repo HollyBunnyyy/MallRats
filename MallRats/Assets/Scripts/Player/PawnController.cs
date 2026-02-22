@@ -80,7 +80,10 @@ public class PawnController : Pawn
             //Set the position of the transform "height" amount from the ground.
             Teleport(GroundInfo.point);
         }
-
+    }
+    
+    protected virtual void FixedUpdate()
+    {
         if (UseGravity && !IsGrounded)
         {
             Rigidbody.AddForce(Vector3.down * Gravity, ForceMode.Acceleration);
