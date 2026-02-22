@@ -23,6 +23,11 @@ public class Motor : MonoBehaviour
         _frictionCalculator = new FrictionCalculator(_rigidbody);
     }
 
+    protected void Reset()
+    {
+        _curveProfile = ScriptableObject.CreateInstance<CurveProfile>();
+    }
+
     public void Move(Vector3 direction, float force, float friction)
     {
         // Gets the difference in direction between our current velocity and the target.
