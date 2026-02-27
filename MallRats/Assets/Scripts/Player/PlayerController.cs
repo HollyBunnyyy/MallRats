@@ -31,11 +31,7 @@ public class PlayerController : PawnController
     [Header("Components")]
 
     [SerializeField]
-    private Camera _camera;
-    public Camera Camera
-    {
-        get { return _camera; }
-    }
+    private CameraController _cameraController;
 
     [SerializeField]
     private InputHandler _inputHandler;
@@ -50,15 +46,49 @@ public class PlayerController : PawnController
         get { return _stateMachine; }
     }
 
+    private GridInventory<Item> _inventoryTest;
+
+    [SerializeField]
+    private GridGraphicController _inventoryUI;
+
+    private bool _isInventoryOpen;
+
     protected void Start()
     {
         _stateMachine = GetComponent<PlayerStateMachine>();
         _stateMachine.SetState(new PlayerStates.PlayerWalkState(_stateMachine, this));
+
+        _inventoryTest = new GridInventory<Item>(8, 5);
+
+        _inventoryTest.AddItem(3, 4, new Item(3, 4));
+
+        _inventoryUI.SetInventory(_inventoryTest);    
+    }
+
+    protected override void Update()
+    {
+        base.Update();
+
+        if (_inputHandler.ShouldInventory)
+        {
+            _isInventoryOpen = !_isInventoryOpen;
+
+            _inventoryUI.gameObject.SetActive(_isInventoryOpen);
+            _cameraController.CanReceieveInput = !_isInventoryOpen;
+
+            Cursor.visible = _isInventoryOpen;
+            Cursor.lockState = _isInventoryOpen ? CursorLockMode.Confined : CursorLockMode.Locked;
+        }
+
+        if (_inputHandler.ShouldInteract)
+        {
+            _inventoryTest.AddItem(2, 2, new Item(2, 2));
+        }
     }
 
     public Vector3 GetMovementDirection()
     {
-        return Quaternion.Euler(0, _camera.transform.eulerAngles.y, 0) * _inputHandler.MovementAxis;
+        return Quaternion.Euler(0, _cameraController.transform.eulerAngles.y, 0) * _inputHandler.MovementAxis;
     }
 
     public override void MoveTowards(Vector3 direction, float force, float friction)
